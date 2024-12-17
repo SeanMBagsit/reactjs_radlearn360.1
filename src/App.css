@@ -1,0 +1,148 @@
+/* General Styles */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #1e344e; /* Dark blue background */
+  color: white; /* White text */
+}
+
+.main-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  text-align: center;
+}
+
+/* Navbar Styles */
+
+header .logo {
+  font-size: 1.5rem; /* Same font size for logo */
+  font-weight: bold;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.nav-links a {
+  position: relative;
+  text-decoration: none;
+  color: #020202;
+  font-size: 1.1rem; /* Ensure same font size */
+  text-transform: uppercase;
+  padding: 10px 20px; /* Same padding for all links */
+  transition: background-color 0.3s ease, color 0.3s ease;
+  letter-spacing: 0.1em;
+}
+
+/* Hover effect for general links */
+.nav-links a:hover {
+  background-color: #457b9d; /* Set background color on hover */
+  color: #ffffff; /* Change text color to white on hover */
+}
+
+/* Active link style */
+.nav-links a.active {
+  background-color: #457b9d; /* Keep background color for active link */
+  color: #ffffff; /* Change text color to white for active link */
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+/* Line effect under the Study link */
+.nav-links a:nth-child(2) {
+  display: inline-block;
+  position: relative;
+}
+
+.nav-links a:nth-child(2)::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: black;
+  transition: width 0.3s ease;
+}
+
+/* Hover effect for the Study link */
+.nav-links a:nth-child(2):hover::after {
+  width: 100%; /* Expand the underline on hover */
+}
+
+/* Remove the tooltip effect */
+.nav-links a::after {
+  content: none; /* No tooltip */
+}
+
+/* Content Styles */
+.content {
+  padding: 20px;
+  margin-top: 60px; /* Adjust for navbar */
+  text-align: center;
+}
+
+.content h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+/* Image Container */
+.body-chart {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.body-chart .human-body {
+  position: relative;
+  display: inline-block;
+  margin: 0 10px; /* Adjusted margin between body images */
+}
+
+.body-img {
+  max-width: 700px; /* 2x bigger */
+  height: auto;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+/* Tooltip Text */
+.tooltip {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #fff;
+  color: #000;
+  padding: 5px;
+  border-radius: 5px;
+  display: none;
+  font-weight: bold;
+  z-index: 5;
+}
+
+.tooltip-text {
+  display: block;
+}
+
+/* Hover Effects */
+#body-1:hover .body-img,
+#body-2:hover .body-img {
+  transform: scale(1.1); /* Slight zoom on hover */
+}
+
+#body-1:hover #tooltip-1 {
+  display: block;
+  left: 1%; /* Tooltip position */
+}
+
+#body-2:hover #tooltip-2 {
+  display: block;
+  right: 1%; /* Tooltip position */
+}
