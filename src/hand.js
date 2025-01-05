@@ -31,7 +31,7 @@ const Hand = () => {
       // Load the 3D model using GLTFLoader
       const loader = new GLTFLoader();
       loader.load(
-        '/models/PA_HAND1.glb', // Path to the 3D model in your public directory
+        '/models/PA_HAND.glb', // Path to the 3D model in your public directory
         (glb) => {
           const model = glb.scene;
           model.scale.set(5, 5, 5); // Adjust model scale

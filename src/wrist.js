@@ -1,58 +1,54 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './wrist.css'; // Assuming your CSS file is in the same directory
+import './wrist.css';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'; // Correct path for GLTFLoader
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'; // Correct path for OrbitControls
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-const Hand = () => {
+const Wrist = () => {
   const [showModel, setShowModel] = useState(false);
   const modelViewerRef = useRef(null);
 
   useEffect(() => {
     if (showModel) {
-      // Initialize Three.js scene when the model is shown
+      // Initialize the 3D model scene
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
       const renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.shadowMap.enabled = true; // Enable shadows
+      renderer.shadowMap.enabled = true;
       modelViewerRef.current.appendChild(renderer.domElement);
+      
 
-      // Create an ambient light for basic illumination
-      const ambientLight = new THREE.AmbientLight(0x404040, 1); // Soft white light
+      const ambientLight = new THREE.AmbientLight(0x404040, 1.5);
       scene.add(ambientLight);
 
-      // Add a directional light to cast shadows and create highlights
       const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
       directionalLight.position.set(5, 5, 5).normalize();
-      directionalLight.castShadow = true; // Enable shadow for this light
+      directionalLight.castShadow = true;
       scene.add(directionalLight);
 
-      // Load the 3D model using GLTFLoader
       const loader = new GLTFLoader();
       loader.load(
-        '/models/LATERAL_WRIST.glb', // Path to the 3D model in your public directory
+        '/models/LATERAL_WRIST.glb', 
         (glb) => {
           const model = glb.scene;
-          model.scale.set(5, 5, 5); // Adjust model scale
-          model.castShadow = true; // Enable shadows on the model
-          model.receiveShadow = true; // Allow model to receive shadows
+          model.scale.set(5, 5, 5);
+          model.castShadow = true;
+          model.receiveShadow = true;
           scene.add(model);
 
-          // Set up the camera position
-          camera.position.z = 5; // Adjust for a better view
-          camera.position.y = 3;
-          camera.position.x = 0;
+          camera.position.z = 1;
+          camera.position.y = 2;
+          camera.position.x = 12;
 
-          // Create OrbitControls for interactivity
           const controls = new OrbitControls(camera, renderer.domElement);
           controls.enableDamping = true;
           controls.dampingFactor = 0.25;
-          controls.screenSpacePanning = false; // Prevent panning out of bounds
+          controls.screenSpacePanning = false;
 
           const animate = () => {
             requestAnimationFrame(animate);
-            controls.update(); // Update controls
+            controls.update();
             renderer.render(scene, camera);
           };
           animate();
@@ -60,11 +56,9 @@ const Hand = () => {
         undefined,
         (error) => {
           console.error('Error loading model:', error);
-          modelViewerRef.current.innerHTML = 'Failed to load 3D model. Please try again later.';
         }
       );
 
-      // Handle window resize events
       window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
@@ -72,7 +66,6 @@ const Hand = () => {
       });
 
       return () => {
-        // Clean up on component unmount
         window.removeEventListener('resize', () => {});
         renderer.dispose();
       };
@@ -93,7 +86,6 @@ const Hand = () => {
         <div className="procedure-container">
           <div className="image-section">
             <div
-              id="view-3d-model"
               className="black-box"
               onClick={handleClick}
               style={{ cursor: 'pointer' }}
@@ -107,21 +99,19 @@ const Hand = () => {
         </div>
       </main>
 
-      {/* Display the 3D model viewer when showModel is true */}
       {showModel && (
         <div
           id="model-viewer-container"
           style={{
             width: '100%',
             height: '100vh',
-            backgroundColor: 'black', // Set background to black
+            backgroundColor: 'black',
             position: 'absolute',
             top: 0,
             left: 0,
             zIndex: 10,
           }}
         >
-          {/* Close Button (X) */}
           <button
             onClick={closeModel}
             style={{
@@ -150,4 +140,4 @@ const Hand = () => {
   );
 };
 
-export default Hand;
+export default Wrist;

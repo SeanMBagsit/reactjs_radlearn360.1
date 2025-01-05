@@ -1,33 +1,25 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, NavLink, useNavigate } from "react-router-dom";
+import { Routes, Route, NavLink } from "react-router-dom"; // No need for BrowserRouter here
 import "./App.css";
 import Study from "./study";
 import Upper from "./upper-ex";
 import Hand from "./hand";
+import Wrist from "./wrist";
+import Lower from "./lower-ex"; 
+import Foot from "./foot"; 
+import Ankle from "./ankle";   
+
 
 const App = () => {
-  const navigate = useNavigate();
-
-  // Handle redirection to the Upper page
-  const handleRedirect = (path) => {
-    navigate(path);
-  };
-
   return (
     <div>
       {/* Navigation Bar */}
       <header className="navbar">
         <div className="logo">RadLearn360</div>
         <nav className="nav-links">
-          <NavLink to="/" className={({ isActive }) => (isActive ? "active" : "")} data-title="Home">
-            Home
-          </NavLink>
-          <NavLink to="/study" className={({ isActive }) => (isActive ? "active" : "")} data-title="Study">
-            Study
-          </NavLink>
-          <NavLink to="/simulation" className={({ isActive }) => (isActive ? "active" : "")} data-title="Simulation">
-            Simulation
-          </NavLink>
+          <NavLink to="/" className={({ isActive }) => (isActive ? "active" : "")}>Home</NavLink>
+          <NavLink to="/study" className={({ isActive }) => (isActive ? "active" : "")}>Study</NavLink>
+          <NavLink to="/simulation" className={({ isActive }) => (isActive ? "active" : "")}>Simulation</NavLink>
         </nav>
       </header>
 
@@ -37,11 +29,14 @@ const App = () => {
         <Route path="/study" element={<Study />} />
         <Route path="/upper" element={<Upper />} />
         <Route path="/simulation" element={<p>Simulation content coming soon!</p>} />
-        <Route path="/hand" element={<Hand />} /> 
+        <Route path="/hand" element={<Hand />} />
+        <Route path="/wrist" element={<Wrist />} />
+        <Route path="/lower" element={<Lower />} /> 
+        <Route path="/foot" element={<Foot />} />  
+        <Route path="/ankle" element={<Ankle />} /> 
       </Routes>
     </div>
   );
 };
 
-// Wrap App in Router in the main index.js file
 export default App;

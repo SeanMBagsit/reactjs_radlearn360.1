@@ -15,8 +15,7 @@ const Upper = () => {
             <div className="section-title">Hands</div>
           </div>
           <ul className="procedure-list">
-            {/* Use Link for navigation to avoid page reload */}
-            <li><Link to="/hand">PA</Link></li>
+            <li><Link to="/hand">PA</Link></li> {/* Linking to Hand page */}
           </ul>
         </section>
 
@@ -28,7 +27,7 @@ const Upper = () => {
             <div className="section-title">Wrist</div>
           </div>
           <ul className="procedure-list">
-            <li><Link to="/wrist">Lateral</Link></li>
+            <li><Link to="/wrist">Lateral</Link></li> {/* Linking to Wrist page */}
           </ul>
         </section>
 
@@ -40,7 +39,7 @@ const Upper = () => {
             <div className="section-title">Elbow</div>
           </div>
           <ul className="procedure-list">
-            <li><Link to="/elbow">PA</Link></li>
+            <li><Link to="/elbow">PA</Link></li> {/* Linking to Elbow page */}
           </ul>
         </section>
       </main>
