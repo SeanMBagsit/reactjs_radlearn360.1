@@ -7,7 +7,8 @@ import Hand from "./hand";
 import Wrist from "./wrist";
 import Lower from "./lower-ex"; 
 import Foot from "./foot"; 
-import Ankle from "./ankle";   
+import Ankle from "./ankle";  
+import Simulation from "./simulation";  
 
 
 const App = () => {
@@ -28,12 +29,13 @@ const App = () => {
         <Route path="/" element={<p>Welcome to the homepage! Test content goes here.</p>} />
         <Route path="/study" element={<Study />} />
         <Route path="/upper" element={<Upper />} />
-        <Route path="/simulation" element={<p>Simulation content coming soon!</p>} />
         <Route path="/hand" element={<Hand />} />
         <Route path="/wrist" element={<Wrist />} />
         <Route path="/lower" element={<Lower />} /> 
         <Route path="/foot" element={<Foot />} />  
         <Route path="/ankle" element={<Ankle />} /> 
+
+        <Route path="/simulation" element={<Simulation />} /> 
       </Routes>
     </div>
   );
