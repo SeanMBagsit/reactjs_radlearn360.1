@@ -5,6 +5,7 @@ import Study from "./study";
 import Upper from "./upper-ex";
 import Hand from "./hand";
 import Wrist from "./wrist";
+import Elbow from "./elbow";  
 import Lower from "./lower-ex"; 
 import Foot from "./foot"; 
 import Ankle from "./ankle";  
@@ -31,10 +32,10 @@ const App = () => {
         <Route path="/upper" element={<Upper />} />
         <Route path="/hand" element={<Hand />} />
         <Route path="/wrist" element={<Wrist />} />
+        <Route path="/elbow" element={<Elbow />} /> 
         <Route path="/lower" element={<Lower />} /> 
         <Route path="/foot" element={<Foot />} />  
         <Route path="/ankle" element={<Ankle />} /> 
-
         <Route path="/simulation" element={<Simulation />} /> 
       </Routes>
     </div>

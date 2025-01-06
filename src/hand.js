@@ -107,19 +107,22 @@ const Hand = () => {
 
     return (
         <div>
-            <main className="content">
-                <div className="procedure-container">
-                    <div className="image-section">
-                        <div
-                            className="black-box"
-                            onClick={handleClick}
-                            style={{ cursor: 'pointer' }}
-                        >
-                            <p>View 3D Model</p>
-                        </div>
-                    </div>
-                </div>
-            </main>
+         <main className="contentmodels">
+        <div className="procedure-container">
+          <div className="image-section">
+            <div
+              className="black-box"
+              onClick={handleClick}
+              style={{ cursor: 'pointer' }}
+            >
+              <p>Click to view 3D Model</p>
+            </div>
+          </div>
+          <div className="text-section">
+            <h2>Patient Position:</h2>
+          </div>
+        </div>
+      </main>
 
             {showModel && (
                 <div

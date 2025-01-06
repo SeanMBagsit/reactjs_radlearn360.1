@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './ankle.css';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DragControls } from 'three/examples/jsm/controls/DragControls';
@@ -7,15 +6,18 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 const Simulation = () => {
     const [showModel, setShowModel] = useState(false);
+    const [showIntro, setShowIntro] = useState(true);
     const [feedbackMessage, setFeedbackMessage] = useState('');
     const [feedbackColor, setFeedbackColor] = useState('red');
     const [handPosition, setHandPosition] = useState({ x: 0, y: 0, z: 0 });
-    const [handRotation, setHandRotation] = useState({ x: 0, y: 0 });
+    const [handRotation, setHandRotation] = useState({ x: 0, y: 0, z: 0 });  // Added z rotation
     const modelViewerRef = useRef(null);
-    const [handModel, setHandModel] = useState(null);
+    const [Model, setModel] = useState(null);
     const dragControlsRef = useRef(null);
+    const [currentItem, setCurrentItem] = useState(0);
+    const [passedCurrentItem, setPassedCurrentItem] = useState(false);
 
-    // Define boundary limits for hand position
+
     const boundaries = {
         minX: -10,
         maxX: 10,
@@ -25,10 +27,66 @@ const Simulation = () => {
         maxZ: 10,
     };
 
-    // Define target angles for rotation (in radians)
-    const targetRotation = {
-        x: Math.PI / 4,  // 45 degrees for X-axis
-        y: Math.PI / 6,  // 30 degrees for Y-axis
+    const simulationSettings = [
+        {
+            ModelFile: '/models/hand.glb',
+            targetPosition: { x: 0.87, y: -8.81, z: -6.13 },
+            targetRotation: { x: 0, y: 0, z: 0 }, // No conversion needed (0 degrees = 0 radians)
+            threshold: 0.5,
+            scale: { x: 1, y: 1, z: 1 }, // Scale added here
+        },
+        {
+            ModelFile: '/models/wrist.glb',
+            targetPosition: { x: 1.33, y: 0.34, z: -0.37 },
+            targetRotation: { 
+                x: 0, 
+                y: 0, 
+                z: -100 * (Math.PI / 180) // Convert -100 degrees to radians (-1.745 radians)
+            },
+            threshold: 0.1,
+            scale: { x: 6, y: 6, z: 6 }, // Scale added here
+        },
+        {
+            ModelFile: '/models/elbow.glb',
+            targetPosition: { x: -3.63, y: -3.33, z: 4.66 },
+            targetRotation: { 
+                x: 0, 
+                y: 0, 
+                z: -180 * (Math.PI / 180) // Convert -180 degrees to radians (-3.142 radians)
+            },
+            threshold: 0.2,
+            scale: { x: 4, y: 4, z: 4 }, // Scale added here
+        },
+        {
+            ModelFile: '/models/foot.glb',
+            targetPosition: { x: 0, y: -7.67, z: 0.38 },
+            targetRotation: { 
+                x: 0,
+                y: 0,
+                z: 0,
+            },
+            threshold: 0.3,
+            scale: { x: 1.2, y: 1.2, z: 1.2 }, // Scale added here
+        },
+        {
+            ModelFile: '/models/foot.glb',
+            targetPosition: { x: 8.06, y:-0.49, z: 3.61 },
+            targetRotation: { 
+                x: 0, 
+                y: 0, 
+                z: -100 * (Math.PI / 180) // Convert -100 degrees to radians (-1.745 radians)
+            },
+            threshold: 0.7,
+            scale: { x: 1, y: 1, z: 1 }, // Scale added here
+        }
+    ];
+    
+    
+
+
+    const enterSimulation = () => {
+        setShowIntro(true);
+        setShowModel(true);
     };
 
     useEffect(() => {
@@ -41,69 +99,78 @@ const Simulation = () => {
                 1000
             );
             camera.position.set(0, 0, 60);
-
+    
             const renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            modelViewerRef.current.innerHTML = '';
             modelViewerRef.current.appendChild(renderer.domElement);
-
+    
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
             scene.add(ambientLight);
-
+    
             const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
             directionalLight.position.set(1.5, 80, 0.5);
             directionalLight.castShadow = true;
             scene.add(directionalLight);
-
+    
             const loader = new GLTFLoader();
-
-            loader.load(
-                '/models/hand.glb',
-                (glb) => {
-                    const loadedHandModel = glb.scene;
-                    loadedHandModel.traverse((child) => {
-                        if (child.isMesh) {
-                            child.castShadow = true;
-                            child.receiveShadow = true;
-                        }
-                    });
-                    loadedHandModel.position.set(0, 0, 0);
-                    scene.add(loadedHandModel);
-                    setHandModel(loadedHandModel);
-
-                    const dragControls = new DragControls([loadedHandModel], camera, renderer.domElement);
-                    dragControlsRef.current = dragControls;
-
-                    // Disable orbit controls while dragging the hand model
-                    dragControls.addEventListener('drag', (event) => {
-                        let { x, y, z } = event.object.position;
-
-                        x = Math.max(boundaries.minX, Math.min(x, boundaries.maxX));
-                        y = Math.max(boundaries.minY, Math.min(y, boundaries.maxY));
-                        z = Math.max(boundaries.minZ, Math.min(z, boundaries.maxZ));
-
-                        event.object.position.set(x, y, z);
-
-                        setHandPosition({ x, y, z });
-                    });
-
-                    // Disable orbit controls when dragging starts
-                    dragControls.addEventListener('dragstart', () => {
-                        cameraControls.enabled = false; // Disable camera movement during drag
-                    });
-
-                    // Re-enable orbit controls when dragging ends
-                    dragControls.addEventListener('dragend', () => {
-                        cameraControls.enabled = true; // Re-enable camera movement after drag
-                    });
-                },
-                undefined,
-                (error) => {
-                    console.error('Error loading hand model:', error);
-                }
-            );
-
+    
+            // Check if currentItem is within bounds of the simulationSettings array
+            const currentSetting = simulationSettings[currentItem] || {};
+    
+            const { ModelFile, scale } = currentSetting;  // Use the currentSetting to prevent destructure error
+    
+            if (ModelFile) {
+                loader.load(
+                    ModelFile,
+                    (glb) => {
+                        const loadedHandModel = glb.scene;
+                        loadedHandModel.traverse((child) => {
+                            if (child.isMesh) {
+                                child.castShadow = true;
+                                child.receiveShadow = true;
+                            }
+                        });
+                        loadedHandModel.position.set(0, 0, 0);
+                        loadedHandModel.scale.set(scale.x, scale.y, scale.z); // Apply the scale here
+                        scene.add(loadedHandModel);
+                        setModel(loadedHandModel);
+    
+                        const dragControls = new DragControls([loadedHandModel], camera, renderer.domElement);
+                        dragControlsRef.current = dragControls;
+    
+                        dragControls.addEventListener('drag', (event) => {
+                            let { x, y, z } = event.object.position;
+                            x = Math.max(boundaries.minX, Math.min(x, boundaries.maxX));
+                            y = Math.max(boundaries.minY, Math.min(y, boundaries.maxY));
+                            z = Math.max(boundaries.minZ, Math.min(z, boundaries.maxZ));
+    
+                            event.object.position.set(x, y, z);
+                            setHandPosition({ x, y, z });
+                        });
+    
+                        dragControls.addEventListener('dragstart', () => {
+                            cameraControls.enabled = false;
+                        });
+    
+                        dragControls.addEventListener('dragend', () => {
+                            cameraControls.enabled = true;
+                        });
+    
+                        camera.position.set(currentSetting.targetPosition?.x || 0, currentSetting.targetPosition?.y || 0, 60);
+                    },
+                    undefined,
+                    (error) => {
+                        console.error('Error loading model:', error);
+                    }
+                );
+            } else {
+                console.error('Model file not found in simulation settings for current item.');
+            }
+    
+            // Load xray model (keeping the existing code)
             loader.load(
                 '/models/xray.glb',
                 (glb) => {
@@ -122,105 +189,146 @@ const Simulation = () => {
                     console.error('Error loading xray model:', error);
                 }
             );
-
+    
             const controls = new OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.dampingFactor = 0.25;
             controls.screenSpacePanning = false;
             controls.maxPolarAngle = Math.PI / 2;
-
-            // Store the controls reference to disable them during dragging
+    
             const cameraControls = controls;
-
+    
             const animate = () => {
                 requestAnimationFrame(animate);
                 controls.update();
                 renderer.render(scene, camera);
             };
             animate();
-
+    
             return () => {
                 renderer.dispose();
                 controls.dispose();
             };
         }
-    }, [showModel]);
-
-    const handleClick = () => {
-        setShowModel(true);
-        setFeedbackMessage('');
-    };
-
-    const closeModel = () => {
-        setShowModel(false);
-        setFeedbackMessage('');
-    };
-
-//SETTINGS IN ORDER SIMULATION TO PASS----------------
-    const handleVerifyPlacement = () => {
-        // Define target position and rotation values
-        const targetPosition = { x: 0.87, y: -8.81, z: -6.13 };
-        const targetRotation = { x: 0, y: 0 };
+    }, [showModel, currentItem]);
     
+
+    const handleVerifyPlacement = () => {
+        const { targetPosition, targetRotation, threshold } = simulationSettings[currentItem];
+    
+        // Calculate distance between current and target positions
         const distance = Math.sqrt(
             Math.pow(handPosition.x - targetPosition.x, 2) +
             Math.pow(handPosition.y - targetPosition.y, 2) +
             Math.pow(handPosition.z - targetPosition.z, 2)
         );
     
-        const threshold = .7; // Allow a small margin of error for position
-    
-        // Check if the position and rotation are within acceptable range
-        const rotationXDifference = Math.abs(handModel.rotation.x - targetRotation.x);
-        const rotationYDifference = Math.abs(handModel.rotation.y - targetRotation.y);
-    
+        // Check both position and all rotation axes
         if (distance <= threshold &&
-            rotationXDifference < 0.01 && // Allow a very small margin of error for rotation
-            rotationYDifference < 0.01) {
+            Math.abs(Model.rotation.x - targetRotation.x) < 0.01 &&
+            Math.abs(Model.rotation.y - targetRotation.y) < 0.01 &&
+            Math.abs(Model.rotation.z - targetRotation.z) < 0.01) {  // Added z-rotation check
             setFeedbackMessage('You passed!');
             setFeedbackColor('green');
+            setPassedCurrentItem(true);
         } else {
             setFeedbackMessage('Wrong position or rotation!');
             setFeedbackColor('red');
         }
     };
-    
 
-    // Control the rotation of the model using sliders
     const handleRotationChange = (axis, value) => {
-        if (!handModel) return;
+        if (!Model) return;
 
-        const rotationValue = parseFloat(value) * Math.PI / 180; // Convert to radians
+        const rotationValue = parseFloat(value) * Math.PI / 180;
         if (axis === 'x') {
-            handModel.rotation.x = rotationValue;
+            Model.rotation.x = rotationValue;
             setHandRotation(prevState => ({ ...prevState, x: rotationValue }));
         } else if (axis === 'y') {
-            handModel.rotation.y = rotationValue;
+            Model.rotation.y = rotationValue;
             setHandRotation(prevState => ({ ...prevState, y: rotationValue }));
+        } else if (axis === 'z') {  // Added z-axis rotation handling
+            Model.rotation.z = rotationValue;
+            setHandRotation(prevState => ({ ...prevState, z: rotationValue }));
         }
     };
 
-    // Right-click interaction
-    const handleRightClick = (event) => {
-        event.preventDefault();
-        console.log("Right-click on the hand model.");
+
+    const handleNextItem = () => {
+        if (currentItem < simulationSettings.length - 1) {
+            setCurrentItem(currentItem + 1);
+            setPassedCurrentItem(false); 
+            setFeedbackMessage('');
+            setFeedbackColor('red');
+            // Reset position and rotation to 0, 0, 0
+            setHandPosition({ x: 0, y: 0, z: 0 });
+            setHandRotation({ x: 0, y: 0, z: 0 });  // Reset rotation
+        }
+    };
+    
+
+    const handleExitSimulation = () => {
+        const confirmation = window.confirm('Are you sure you want to exit? All progress will be lost.');
+        if (confirmation) {
+            setShowModel(false);
+            setShowIntro(true);
+            setCurrentItem(0);
+            setHandPosition({ x: 0, y: 0, z: 0 });
+            setHandRotation({ x: 0, y: 0, z: 0 });  // Reset z rotation
+            setFeedbackMessage('');
+            setFeedbackColor('red');
+            setPassedCurrentItem(false);
+    
+            if (Model) {
+                Model.traverse((child) => {
+                    if (child.isMesh) {
+                        child.geometry.dispose();
+                        child.material.dispose();
+                    }
+                });
+            }
+    
+            if (dragControlsRef.current) {
+                dragControlsRef.current.dispose();
+                dragControlsRef.current = null;
+            }
+            
+            if (modelViewerRef.current) {
+                modelViewerRef.current.innerHTML = '';
+            }
+        }
     };
 
     return (
         <div>
-            <main className="content">
-                <div className="procedure-container">
-                    <div className="image-section">
-                        <div
-                            className="black-box"
-                            onClick={handleClick}
-                            style={{ cursor: 'pointer' }}
-                        >
-                            <p>Start Simulation</p>
-                        </div>
-                    </div>
+            {showIntro && (
+                <div
+                    style={{
+                        width: '100%',
+                        height: '100vh',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        color: 'white',
+                        fontSize: '30px',
+                    }}
+                >
+                    <button
+                        onClick={enterSimulation}
+                        style={{
+                            backgroundColor: 'blue',
+                            color: 'white',
+                            padding: '15px 30px',
+                            border: 'none',
+                            borderRadius: '5px',
+                            fontSize: '24px',
+                            cursor: 'pointer',
+                        }}
+                    >
+                        Start Simulation
+                    </button>
                 </div>
-            </main>
+            )}
 
             {showModel && (
                 <div
@@ -236,7 +344,7 @@ const Simulation = () => {
                     }}
                 >
                     <button
-                        onClick={closeModel}
+                        onClick={handleExitSimulation}
                         style={{
                             position: 'absolute',
                             top: '20px',
@@ -252,10 +360,44 @@ const Simulation = () => {
                         X
                     </button>
 
+                    {/* Progress Tracker */}
+                    <div
+                        style={{
+                            position: 'absolute',
+                            top: '10px',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            width: '80%',
+                            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                            padding: '5px',
+                            borderRadius: '5px',
+                        }}
+                    >
+                        <div
+                            style={{
+                                width: `${((currentItem + 1) / simulationSettings.length) * 100}%`,
+                                height: '10px',
+                                backgroundColor: 'green',
+                                borderRadius: '5px',
+                            }}
+                        ></div>
+                        <div
+                            style={{
+                                position: 'absolute',
+                                width: '100%',
+                                textAlign: 'center',
+                                color: 'white',
+                                fontSize: '16px',
+                                top: '15px',
+                            }}
+                        >
+                            {`${currentItem + 1}/${simulationSettings.length}`}
+                        </div>
+                    </div>
+
                     <div
                         id="model-viewer"
                         ref={modelViewerRef}
-                        onContextMenu={handleRightClick}
                         style={{ width: '100%', height: '100%' }}
                     ></div>
 
@@ -277,6 +419,27 @@ const Simulation = () => {
                         Verify Placement
                     </button>
 
+                    {passedCurrentItem && (
+                        <button
+                            onClick={handleNextItem}
+                            style={{
+                                position: 'absolute',
+                                bottom: '100px',
+                                left: '40px',
+                                backgroundColor: 'green',
+                                color: 'white',
+                                padding: '20px 30px',
+                                border: 'none',
+                                borderRadius: '9px',
+                                fontSize: '30px',
+                                cursor: 'pointer',
+                                zIndex: 20,
+                            }}
+                        >
+                            Next
+                        </button>
+                    )}
+
                     {feedbackMessage && (
                         <div
                             style={{
@@ -296,56 +459,67 @@ const Simulation = () => {
                     <div
                         style={{
                             position: 'absolute',
-                            top: '20px',
+                            top: '40px',
                             left: '20px',
                             color: 'white',
                             fontSize: '18px',
-                            zIndex: 20,
+                            zIndex: 15,
                         }}
                     >
-                        {`Position: X: ${handPosition.x.toFixed(2)} Y: ${handPosition.y.toFixed(2)} Z: ${handPosition.z.toFixed(2)}`}
-                        <br />
-                        {`Rotation: X: ${(handRotation.x * 180 / Math.PI).toFixed(2)}° Y: ${(handRotation.y * 180 / Math.PI).toFixed(2)}°`}
+                        <div>Hand Position: ({handPosition.x.toFixed(2)}, {handPosition.y.toFixed(2)}, {handPosition.z.toFixed(2)})</div>
+                        <div>Hand Rotation: ({(handRotation.x * 180 / Math.PI).toFixed(2)}°, {(handRotation.y * 180 / Math.PI).toFixed(2)}°, {(handRotation.z * 180 / Math.PI).toFixed(2)}°)</div>
                     </div>
-
-                    {/* Rotation Sliders */}
                     <div
                         style={{
                             position: 'absolute',
                             bottom: '20px',
                             right: '20px',
-                            zIndex: 20,
+                            color: 'white',
+                            fontSize: '18px',
+                            zIndex: 15,
                         }}
                     >
-                        <div style={{ marginBottom: '10px', color: 'white' }}>Rotate X Axis</div>
-                        <input
-                            type="range"
-                            min="-180"
-                            max="180"
-                            step="1"
-                            defaultValue="0"
-                            onChange={(e) => handleRotationChange('x', e.target.value)}
-                            style={{
-                                width: '150px',
-                                background: '#ddd',
-                                borderRadius: '5px',
-                            }}
-                        />
-                        <div style={{ marginTop: '10px', color: 'white' }}>Rotate Y Axis</div>
-                        <input
-                            type="range"
-                            min="-180"
-                            max="180"
-                            step="1"
-                            defaultValue="0"
-                            onChange={(e) => handleRotationChange('y', e.target.value)}
-                            style={{
-                                width: '150px',
-                                background: '#ddd',
-                                borderRadius: '5px',
-                            }}
-                        />
+                        {/* X Rotation */}
+                        <div style={{ marginBottom: '10px' }}>
+                            <div>X Rotation</div>
+                            <input
+                                type="range"
+                                min="-180"
+                                max="180"
+                                value={handRotation.x * (180 / Math.PI)}
+                                onChange={(e) => handleRotationChange('x', e.target.value)}
+                                style={{ width: '200px' }}
+                            />
+                        </div>
+
+                        {/* Y Rotation */}
+                        <div style={{ marginBottom: '10px' }}>
+                            <div>Y Rotation</div>
+                            <input
+                                type="range"
+                                min="-180"
+                                max="180"
+                                value={handRotation.y * (180 / Math.PI)}
+                                onChange={(e) => handleRotationChange('y', e.target.value)}
+                                style={{ width: '200px' }}
+                            />
+                        </div>
+
+                        {/* Z Rotation */}
+                        <div style={{ marginBottom: '10px' }}>
+                            <div>Z Rotation</div>
+                            <input
+                                type="range"
+                                min="-180"
+                                max="180"
+                                value={handRotation.z * (180 / Math.PI)}
+                                onChange={(e) => handleRotationChange('z', e.target.value)}
+                                style={{ width: '200px' }}
+                            />
+                        </div>
                     </div>
+
+
                 </div>
             )}
         </div>

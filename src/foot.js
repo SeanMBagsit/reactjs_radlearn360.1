@@ -1,102 +1,119 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './foot.css';
+import './ankle.css';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-const Foot= () => {
-  const [showModel, setShowModel] = useState(false);
-  const modelViewerRef = useRef(null);
+const Foot = () => {
+    const [showModel, setShowModel] = useState(false);
+    const modelViewerRef = useRef(null);
 
-  useEffect(() => {
-    if (showModel) {
-      // Initialize the 3D model scene
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-      const renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.shadowMap.enabled = true;
-      modelViewerRef.current.appendChild(renderer.domElement);
+    useEffect(() => {
+        if (showModel) {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(
+                30,
+                window.innerWidth / window.innerHeight,
+                0.1,
+                1000
+            );
+            camera.position.set(1, 20, -12);
 
-      // Add realistic ambient lighting
-      const ambientLight = new THREE.AmbientLight(0x404040, 1.5); // Increased intensity for better ambient lighting
-      scene.add(ambientLight);
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            modelViewerRef.current.appendChild(renderer.domElement);
 
-      // Add directional light with shadows
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
-      directionalLight.position.set(5, 5, 5).normalize();
-      directionalLight.castShadow = true;
-      scene.add(directionalLight);
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
 
-      // Add a second light source for more depth
-      const pointLight = new THREE.PointLight(0xFFFFFF, 2, 100);
-      pointLight.position.set(-50, 50, 50);
-      pointLight.castShadow = true;
-      scene.add(pointLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            directionalLight.position.set(1.5, 80, 0.5);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
 
-      // Add a Hemisphere Light for more ambient realism
-      const hemisphereLight = new THREE.HemisphereLight(0xFFFFBB, 0x080820, 1);
-      scene.add(hemisphereLight);
+            const loader = new GLTFLoader();
 
-      // Load the 3D model
-      const loader = new GLTFLoader();
-      loader.load(
-        '/models/AP_FOOT.glb', 
-        (glb) => {
-          const model = glb.scene;
-          model.scale.set(5, 5, 5);
-          model.castShadow = true;
-          model.receiveShadow = true;
-          scene.add(model);
+            // Load model in static position
+            loader.load(
+              '/models/foot.glb',
+              (glb) => {
+                  const loadedHandModel = glb.scene;
+                  loadedHandModel.traverse((child) => {
+                      if (child.isMesh) {
+                          child.castShadow = true;
+                          child.receiveShadow = true;
+                      }
+                  });
+          
+                  // Adjust the scale here
+                  loadedHandModel.scale.set(1.2,1.2,1.2); // Set desired scale
+          
+                  // Set rotation: x = 0 degrees, y = 0 degrees, z = -100 degrees
+                  loadedHandModel.rotation.set(0, 0, 0,); // -Math.PI is -180 degrees in radians
+          
+                  loadedHandModel.position.set(.2, -9.5, 0);
+                  scene.add(loadedHandModel);
+              },
+              undefined,
+              (error) => {
+                  console.error('Error loading hand model:', error);
+              }
+          );
 
-          camera.position.z = 150;
-          camera.position.y = 200;  // Position adjusted for a better view
-          camera.position.x = 10;
+            // Load X-ray model
+            loader.load(
+                '/models/xray.glb',
+                (glb) => {
+                    const loadedXrayModel = glb.scene;
+                    loadedXrayModel.traverse((child) => {
+                        if (child.isMesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                        }
+                    });
+                    loadedXrayModel.position.set(0, -10, 0);
+                    scene.add(loadedXrayModel);
+                },
+                undefined,
+                (error) => {
+                    console.error('Error loading xray model:', error);
+                }
+            );
 
-          const controls = new OrbitControls(camera, renderer.domElement);
-          controls.enableDamping = true;
-          controls.dampingFactor = 0.25;
-          controls.screenSpacePanning = false;
-          controls.maxDistance = 500; // Control the zoom distance
-          controls.minDistance = 50;  // Control the minimum zoom distance
+            // Setup OrbitControls for camera manipulation
+            const controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.25;
+            controls.screenSpacePanning = false;
+            controls.maxPolarAngle = Math.PI / 2;
 
-          const animate = () => {
-            requestAnimationFrame(animate);
-            controls.update();
-            renderer.render(scene, camera);
-          };
-          animate();
-        },
-        undefined,
-        (error) => {
-          console.error('Error loading model:', error);
+            const animate = () => {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, camera);
+            };
+            animate();
+
+            return () => {
+                renderer.dispose();
+                controls.dispose();
+            };
         }
-      );
+    }, [showModel]);
 
-      window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-      });
+    const handleClick = () => {
+        setShowModel(true);
+    };
 
-      return () => {
-        window.removeEventListener('resize', () => {});
-        renderer.dispose();
-      };
-    }
-  }, [showModel]);
+    const closeModel = () => {
+        setShowModel(false);
+    };
 
-  const handleClick = () => {
-    setShowModel(true);
-  };
-
-  const closeModel = () => {
-    setShowModel(false);
-  };
-
-  return (
-    <div>
-      <main className="content">
+    return (
+        <div>
+         <main className="contentmodels">
         <div className="procedure-container">
           <div className="image-section">
             <div
@@ -113,45 +130,45 @@ const Foot= () => {
         </div>
       </main>
 
-      {showModel && (
-        <div
-          id="model-viewer-container"
-          style={{
-            width: '100%',
-            height: '100vh',
-            backgroundColor: 'black',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            zIndex: 10,
-          }}
-        >
-          <button
-            onClick={closeModel}
-            style={{
-              position: 'absolute',
-              top: '20px',
-              right: '20px',
-              backgroundColor: 'transparent',
-              border: 'none',
-              color: 'white',
-              fontSize: '30px',
-              cursor: 'pointer',
-              zIndex: 20,
-            }}
-          >
-            X
-          </button>
+            {showModel && (
+                <div
+                    id="model-viewer-container"
+                    style={{
+                        width: '100%',
+                        height: '100vh',
+                        backgroundColor: 'black',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        zIndex: 10,
+                    }}
+                >
+                    <button
+                        onClick={closeModel}
+                        style={{
+                            position: 'absolute',
+                            top: '20px',
+                            right: '20px',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            color: 'white',
+                            fontSize: '30px',
+                            cursor: 'pointer',
+                            zIndex: 20,
+                        }}
+                    >
+                        X
+                    </button>
 
-          <div
-            id="model-viewer"
-            ref={modelViewerRef}
-            style={{ width: '100%', height: '100%' }}
-          ></div>
+                    <div
+                        id="model-viewer"
+                        ref={modelViewerRef}
+                        style={{ width: '100%', height: '100%' }}
+                    ></div>
+                </div>
+            )}
         </div>
-      )}
-    </div>
-  );
+    );
 };
 
 export default Foot;
