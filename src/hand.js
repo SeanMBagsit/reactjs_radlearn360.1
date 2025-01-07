@@ -17,7 +17,7 @@ const Hand = () => {
                 0.1,
                 1000
             );
-            camera.position.set(1, 20, -12);
+            camera.position.set(0, 30, -12);
 
             const renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -107,22 +107,48 @@ const Hand = () => {
 
     return (
         <div>
-         <main className="contentmodels">
+        <main className="contentmodels">
         <div className="procedure-container">
-          <div className="image-section">
-            <div
-              className="black-box"
-              onClick={handleClick}
-              style={{ cursor: 'pointer' }}
-            >
-              <p>Click to view 3D Model</p>
+        <div className="image-section">
+            <div className="black-box" onClick={handleClick}>
+                <img src="/pics/hand.png" alt="Hand Image" className="black-box-image" />
+                <p>Click to View 3D Model</p>
             </div>
-          </div>
-          <div className="text-section">
-            <h2>Patient Position:</h2>
-          </div>
         </div>
-      </main>
+                <div className="text-section">
+                    <h2>Clinical Details:</h2>
+                    <div className="scrollable-box">
+                        <h3>Clinical Indications:</h3>
+                        <ul className="highlighted-list">
+                            <li>Fractures, dislocations, or foreign bodies of the phalanges, metacarpals, and all joints of the hand.</li>
+                            <li>Pathologic processes such as osteoporosis and osteoarthritis.</li>
+                        </ul>
+                        <h3>Technical Factors:</h3>
+                        <ul className="technical-details">
+                            <li><strong>Minimum SID:</strong> 40 inches (100 cm).</li>
+                            <li><strong>IR size:</strong> 10 x 12 inches (24 x 30 cm), portrait; collimate to area of interest.</li>
+                            <li><strong>kVp range:</strong> 55 to 65.</li>
+                            <li><strong>Shielding:</strong> Shield radiosensitive tissues outside the region of interest.</li>
+                        </ul>
+                        <h3>Patient Position:</h3>
+                        <p>Seat patient at the end of the table with hand and forearm extended.</p>
+                        <h3>Part Position:</h3>
+                        <ul>
+                            <li>Pronate hand with palmar surface in contact with IR; spread fingers slightly.</li>
+                            <li>Align the long axis of hand and forearm with the long axis of IR.</li>
+                            <li>Center hand and wrist to IR.</li>
+                        </ul>
+                        <h3>CR:</h3>
+                        <p>CR perpendicular to IR, directed to third MCP joint.</p>
+                        <h3>Recommended Collimation:</h3>
+                        <p>Collimate on four sides to the outer margins of hand and wrist.</p>
+                        <h3>Note:</h3>
+                        <p>If examinations of both hands or wrists are requested, the body parts should be positioned and exposed separately for correct CR placement.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
 
             {showModel && (
                 <div

@@ -1,27 +1,43 @@
 import React from "react";
-import { Routes, Route, NavLink } from "react-router-dom"; // No need for BrowserRouter here
+import { Routes, Route, NavLink, useLocation } from "react-router-dom";
 import "./App.css";
 import Study from "./study";
 import Upper from "./upper-ex";
 import Hand from "./hand";
 import Wrist from "./wrist";
-import Elbow from "./elbow";  
-import Lower from "./lower-ex"; 
-import Foot from "./foot"; 
-import Ankle from "./ankle";  
-import Simulation from "./simulation";  
-
+import Elbow from "./elbow";
+import Lower from "./lower-ex";
+import Foot from "./foot";
+import Ankle from "./ankle";
+import Simulation from "./simulation";
 
 const App = () => {
+  const location = useLocation();
+  
+  // Check if current path is study-related
+  const isStudyRoute = () => {
+    const studyPaths = ['/study', '/upper', '/hand', '/wrist', '/elbow', '/lower', '/foot', '/ankle'];
+    return studyPaths.some(path => location.pathname === path);
+  };
+
   return (
     <div>
       {/* Navigation Bar */}
       <header className="navbar">
         <div className="logo">RadLearn360</div>
         <nav className="nav-links">
-          <NavLink to="/" className={({ isActive }) => (isActive ? "active" : "")}>Home</NavLink>
-          <NavLink to="/study" className={({ isActive }) => (isActive ? "active" : "")}>Study</NavLink>
-          <NavLink to="/simulation" className={({ isActive }) => (isActive ? "active" : "")}>Simulation</NavLink>
+          <NavLink to="/" className={({ isActive }) => (isActive ? "active" : "")}>
+            Home
+          </NavLink>
+          <NavLink 
+            to="/study" 
+            className={isStudyRoute() ? "active" : ""}
+          >
+            Study
+          </NavLink>
+          <NavLink to="/simulation" className={({ isActive }) => (isActive ? "active" : "")}>
+            Simulation
+          </NavLink>
         </nav>
       </header>
 
@@ -32,11 +48,11 @@ const App = () => {
         <Route path="/upper" element={<Upper />} />
         <Route path="/hand" element={<Hand />} />
         <Route path="/wrist" element={<Wrist />} />
-        <Route path="/elbow" element={<Elbow />} /> 
-        <Route path="/lower" element={<Lower />} /> 
-        <Route path="/foot" element={<Foot />} />  
-        <Route path="/ankle" element={<Ankle />} /> 
-        <Route path="/simulation" element={<Simulation />} /> 
+        <Route path="/elbow" element={<Elbow />} />
+        <Route path="/lower" element={<Lower />} />
+        <Route path="/foot" element={<Foot />} />
+        <Route path="/ankle" element={<Ankle />} />
+        <Route path="/simulation" element={<Simulation />} />
       </Routes>
     </div>
   );

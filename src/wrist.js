@@ -17,7 +17,7 @@ const Wrist = () => {
                 0.1,
                 1000
             );
-            camera.position.set(1, 20, -12);
+            camera.position.set(0, 30, -12);
 
             const renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -116,22 +116,53 @@ const Wrist = () => {
 
     return (
         <div>
-         <main className="contentmodels">
-        <div className="procedure-container">
-          <div className="image-section">
-            <div
-              className="black-box"
-              onClick={handleClick}
-              style={{ cursor: 'pointer' }}
-            >
-              <p>Click to view 3D Model</p>
+          <main className="contentmodels">
+    <div className="procedure-container">
+        <div className="image-section">
+            <div className="black-box" onClick={handleClick}>
+                <img src="/pics/wrist.png" alt="Wrist Image" className="black-box-image" />
+                <p>Click to View 3D Model</p>
             </div>
-          </div>
-          <div className="text-section">
-            <h2>Patient Position:</h2>
-          </div>
         </div>
-      </main>
+        <div className="text-section">
+            <h2>Clinical Details</h2>
+            <div className="scrollable-box">
+                <h3>Clinical Indications:</h3>
+                <ul>
+                    <li>Fractures or dislocations of the distal radius or ulna, specifically anteroposterior fragment displacements for Barton, Colles, or Smith fractures.</li>
+                    <li>Osteoarthritis also may be demonstrated primarily in the trapezium and first CMC joint.</li>
+                </ul>
+                <h3>Technical Factors:</h3>
+                <ul>
+                    <li><strong>Minimum SID:</strong> 40 inches (100 cm).</li>
+                    <li><strong>IR size:</strong> 8 x 10 inches (18 x 24 cm), portrait; smallest IR available and collimate to area of interest.</li>
+                    <li><strong>Nongrid</strong></li>
+                    <li><strong>kVp range:</strong> 60 to 70.</li>
+                </ul>
+                <h3>Shielding:</h3>
+                <p>Shield radiosensitive tissues outside the region of interest.</p>
+                <h3>Patient Position:</h3>
+                <p>
+                    Seat patient at the end of the table, with arm and forearm resting on the table. Place wrist and hand on IR in a thumb-up lateral position. Shoulder, elbow, and wrist should be on the same horizontal plane.
+                </p>
+                <h3>Part Position:</h3>
+                <ul>
+                    <li>Align and center hand and wrist to the long axis of IR.</li>
+                    <li>
+                        Adjust hand and wrist into a true lateral position, with fingers comfortably extended; if support is needed to prevent motion, use a radiolucent support block and sandbag, and place the block against extended hand and fingers.
+                    </li>
+                </ul>
+                <h3>CR:</h3>
+                <p>CR perpendicular to IR, directed to midcarpal area.</p>
+                <h3>Recommended Collimation:</h3>
+                <p>Collimate on four sides, including distal radius and ulna and metacarpal area.</p>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+
 
             {showModel && (
                 <div

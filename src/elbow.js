@@ -17,7 +17,7 @@ const Elbow = () => {
                 0.1,
                 1000
             );
-            camera.position.set(1, 20, -12);
+            camera.position.set(0, 30, -12);
 
             const renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -115,15 +115,12 @@ const Elbow = () => {
         <div>
          <main className="contentmodels">
         <div className="procedure-container">
-          <div className="image-section">
-            <div
-              className="black-box"
-              onClick={handleClick}
-              style={{ cursor: 'pointer' }}
-            >
-              <p>Click to view 3D Model</p>
+        <div className="image-section">
+            <div className="black-box" onClick={handleClick}>
+                <img src="/pics/elbow.png" alt="Elbow Image" className="black-box-image" />
+                <p>Click to View 3D Model</p>
             </div>
-          </div>
+        </div>
           <div className="text-section">
             <h2>Patient Position:</h2>
           </div>

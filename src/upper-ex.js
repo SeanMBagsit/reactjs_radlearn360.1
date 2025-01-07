@@ -39,7 +39,7 @@ const Upper = () => {
             <div className="section-title">Elbow</div>
           </div>
           <ul className="procedure-list">
-            <li><Link to="/elbow">PA</Link></li> {/* Linking to Elbow page */}
+            <li><Link to="/elbow">AP</Link></li> {/* Linking to Elbow page */}
           </ul>
         </section>
       </main>
