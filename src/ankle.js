@@ -122,9 +122,39 @@ const Ankle = () => {
                 <p>Click to View 3D Model</p>
             </div>
         </div>
-          <div className="text-section">
-            <h2>Patient Position:</h2>
+        <div className="text-section">
+    <h2>Clinical Details</h2>
+    <div className="scrollable-box">
+        <h3>Clinical Indications:</h3>
+        <ul>
+            <li>Projection is useful in the evaluation of fractures, dislocations, and joint effusions.</li>
+            <li>Associated with other joint pathologies.</li>
+        </ul>
+        <h3>Technical Factors:</h3>
+        <ul>
+            <li><strong>Minimum SID:</strong> 40 inches (100 cm).</li>
+            <li><strong>IR size:</strong> 10 x 12 inches (24 x 30 cm), portrait.</li>
+            <li><strong>Nongrid</strong></li>
+            <li><strong>kVp range:</strong> 60 to 75.</li>
+        </ul>
+        <h3>Shielding:</h3>
+        <p>Shield radiosensitive tissues outside the region of interest.</p>
+        <h3>Patient Position:</h3>
+        <p>
+            Place the patient in the lateral recumbent position, affected side down; provide a pillow for the patient’s head; flex the knee of the affected limb approximately 45°. Place the opposite leg behind the injured limb to prevent over-rotation.
+        </p>
+        <h3>Part Position (Mediolateral Projection):</h3>
+        <ul>
+            <li>Center and align the ankle joint to the CR and the long axis of the portion of the IR being exposed.</li>
+            <li>Place support under the knee as needed to place the leg and foot in a true lateral position.</li>
+            <li>Dorsiflex the foot so that the plantar surface is at a right angle to the leg or as far as the patient can tolerate (do not force). This helps maintain a true lateral position.</li>
+        </ul>
+        <h3>CR:</h3>
+        <p>CR perpendicular to IR, directed to the medial malleolus.</p>
+        <h3>Recommended Collimation:</h3>
+        <p>Collimate to include the distal tibia and fibula to the midmetatarsal area.</p>
           </div>
+        </div>
         </div>
       </main>
 
