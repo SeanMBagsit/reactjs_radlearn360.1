@@ -130,6 +130,8 @@ const Hand = () => {
                             <li><strong>kVp range:</strong> 55 to 65.</li>
                             <li><strong>Shielding:</strong> Shield radiosensitive tissues outside the region of interest.</li>
                         </ul>
+                        <h3>Shielding:</h3>
+                        <p>Shield radiosensitive tissues outside region of interest.</p>
                         <h3>Patient Position:</h3>
                         <p>Seat patient at the end of the table with hand and forearm extended.</p>
                         <h3>Part Position:</h3>

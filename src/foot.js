@@ -113,19 +113,52 @@ const Foot = () => {
 
     return (
         <div>
-         <main className="contentmodels">
+        <main className="contentmodels">
         <div className="procedure-container">
         <div className="image-section">
             <div className="black-box" onClick={handleClick}>
-                <img src="/pics/foot.png" alt="Foot Image" className="black-box-image" />
+                <img src="/pics/foot.png" alt="Hand Image" className="black-box-image" />
                 <p>Click to View 3D Model</p>
             </div>
         </div>
-          <div className="text-section">
-            <h2>Patient Position:</h2>
-          </div>
-        </div>
-      </main>
+                <div className="text-section">
+                    <h2>Clinical Details:</h2>
+                    <div className="scrollable-box">
+                    <h2>Clinical Indications:</h2>
+                        <ul>
+                            <li>Location and extent of fractures and fragment alignments.</li>
+                            <li>Joint space abnormalities, soft tissue effusions.</li>
+                            <li>Location of opaque foreign bodies.</li>
+                        </ul>
+                        <h2>Technical Factors:</h2>
+                        <ul>
+                            <li><strong>Minimum SID:</strong> 40 inches (100 cm).</li>
+                            <li><strong>IR size:</strong> 10 x 12 inches (24 x 30 cm), portrait.</li>
+                            <li><strong>kVp range:</strong> 55–65.</li>
+                            <li><strong>Shielding:</strong> Shield radiosensitive tissues outside region of interest.</li>
+                        </ul>
+                        <h3>Shielding:</h3>
+                        <p>Shield radiosensitive tissues outside region of interest.</p>
+                        <h2>Patient Position:</h2>
+                        <p>Place patient supine; provide a pillow for the patient’s head; flex knee and place plantar surface (sole) of affected foot flat on IR.</p>
+                        <h2>Part Position:</h2>
+                        <ul>
+                            <li>Extend (plantar flex) foot but maintain plantar surface resting flat and firmly on IR.</li>
+                            <li>Align and center long axis of foot to CR and to the long axis of the portion of IR being exposed.</li>
+                            <li>Use sandbags if necessary to prevent IR from slipping on the tabletop.</li>
+                            <li>If immobilization is needed, flex opposite knee and rest against affected knee for support.</li>
+                        </ul>
+                        <h2>CR:</h2>
+                        <ul>
+                            <li>Angle CR 10° posteriorly (toward heel) with CR perpendicular to metatarsals.</li>
+                            <li>Direct CR to base of third metatarsal.</li>
+                        </ul>
+                        <h2>Recommended Collimation:</h2>
+                        <p>Collimate to outer margins of the foot on four sides.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
 
             {showModel && (
                 <div

@@ -113,19 +113,48 @@ const Elbow = () => {
 
     return (
         <div>
-         <main className="contentmodels">
+        <main className="contentmodels">
         <div className="procedure-container">
         <div className="image-section">
             <div className="black-box" onClick={handleClick}>
-                <img src="/pics/elbow.png" alt="Elbow Image" className="black-box-image" />
+                <img src="/pics/elbow.png" alt="Hand Image" className="black-box-image" />
                 <p>Click to View 3D Model</p>
             </div>
         </div>
-          <div className="text-section">
-            <h2>Patient Position:</h2>
-          </div>
-        </div>
-      </main>
+                <div className="text-section">
+                    <h2>Clinical Details:</h2>
+                    <div className="scrollable-box">
+                        <h3>Clinical Indications:</h3>
+                        <ul className="highlighted-list">
+                            <li>Fractures and dislocations of the elbow</li>
+                            <li>Pathologic processes, such as osteomyelitis and arthritis</li>
+                        </ul>
+                        <h3>Technical Factors:</h3>
+                        <ul className="technical-details">
+                            <li><strong>Minimum SID:</strong> 40 inches (100 cm).</li>
+                            <li><strong>IR size:</strong> 10 x 12 inches (24 x 30 cm), portrait; smallest IR available and collimate to area of interest.</li>
+                            <li><strong>Nongrid</strong></li>
+                            <li><strong>kVp range:</strong> 65 to 75.</li>
+                        </ul>
+                        <h3>Shielding:</h3>
+                        <p>Shield radiosensitive tissues outside the region of interest.</p>
+                        <h3>Patient Position:</h3>
+                        <p>Seat patient at the end of the table, with elbow fully extended, if possible. (See following page if the patient cannot fully extend the elbow.)</p>
+                        <h3>Part Position:</h3>
+                        <ul>
+                            <li>Extend elbow, supinate hand, and align arm and forearm with the long axis of IR.</li>
+                            <li>Center elbow joint to the center of IR.</li>
+                            <li>Ask the patient to lean laterally as necessary for true AP projection. Palpate humeral epicondyles to ensure that the interepicondylar plane is parallel to the IR. (The interepicondylar plane is an imaginary plane between the medial and lateral epicondyles of the distal humerus. This plane is useful for elbow and humerus positioning.)</li>
+                            <li>Support hand as needed to prevent motion.</li>
+                        </ul>
+                        <h3>CR:</h3>
+                        <p>CR perpendicular to IR, directed to mid-elbow joint, which is approximately 3/4 inch (2 cm) distal to the midpoint of a line between epicondyles.</p>
+                        <h3>Recommended Collimation:</h3>
+                        <p>Collimate on four sides to the area of interest.</p>
+                    </div>
+                    </div>
+                    </div>
+                </main>
 
             {showModel && (
                 <div
