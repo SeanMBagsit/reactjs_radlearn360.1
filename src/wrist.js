@@ -9,6 +9,7 @@ const Wrist = () => {
     const modelViewerRef = useRef(null);
 
     useEffect(() => {
+        document.body.style.overflow = 'hidden'; // Prevent scroll when model is shown
         if (showModel) {
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(

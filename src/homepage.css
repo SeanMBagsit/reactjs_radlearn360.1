@@ -1,0 +1,190 @@
+/* Base Styles */
+.homepage {
+  font-family: 'Poppins', sans-serif; /* Update font for a modern feel */
+  color: #1f2937; /* Gray 900 */
+  min-height: 100vh; /* Ensure page fills height */
+  padding-bottom: 3rem; /* Add padding to prevent footer from blocking content */
+  overflow-y: auto; /* Ensure vertical scrollbar is visible */
+  background-color: #f9fafb; /* Light background color */
+}
+
+/* Hero Section */
+.hero {
+  position: relative;
+  background: linear-gradient(to right, #1d4ed8, #1e3a8a); /* Blue gradient */
+  color: white;
+  text-align: center;
+  padding: 8rem 2rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Improved shadow effect */
+  border-radius: 15px; /* Rounded corners for modern look */
+}
+
+.hero-title {
+  font-size: 3.5rem; /* Larger title for better impact */
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.hero-desc {
+  margin-top: 1rem;
+  font-size: 1.25rem;
+  color: #e5e7eb; /* Gray 200 */
+  max-width: 35rem;
+  margin-left: auto;
+  margin-right: auto;
+  animation: fadeIn 1s ease-in-out 0.2s;
+}
+
+/* Features Section */
+.features {
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.features-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e40af; /* Blue 800 */
+  margin-bottom: 2rem;
+}
+
+.features-grid {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.feature-card {
+  background-color: white;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 0.375rem;
+  padding: 1.5rem;
+  transition: transform 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.feature-card:hover {
+  transform: scale(1.05);
+}
+
+.feature-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e40af; /* Blue 800 */
+}
+
+.feature-desc {
+  margin-top: 1rem;
+  color: #4b5563; /* Gray 600 */
+  flex-grow: 1;
+}
+
+/* Testimonials Section */
+.testimonials {
+  background-color: #f3f4f6; /* Gray 100 */
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.testimonials-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e40af; /* Blue 800 */
+}
+
+.testimonials-list {
+  margin-top: 2rem;
+  max-width: 40rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.testimonial-item {
+  font-size: 1.125rem;
+  font-style: italic;
+  color: #4b5563; /* Gray 700 */
+  margin-top: 1.25rem;
+  border-left: 4px solid #1e40af; /* Blue 800 */
+  padding-left: 1rem;
+  position: relative;
+}
+
+.testimonial-item:before {
+  content: '"';
+  font-size: 3rem;
+  color: #1e40af;
+  position: absolute;
+  top: -20px;
+  left: -15px;
+}
+
+/* Footer */
+.footer {
+  background-color: #1d4ed8; /* Blue 700 */
+  color: white;
+  padding: 1.5rem;
+  text-align: center;
+  margin-top: 3rem;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Animations */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Lighter track background */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+/* Homepage Specific Scrollbar (Always Visible) */
+.homepage {
+  overflow-y: auto; /* Forces vertical scrollbar to always be visible on homepage */
+  min-height: 100vh; /* Ensures page fills the height */
+}
+
+/* Global Media Queries for Responsiveness */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  .hero-desc {
+    font-size: 1.125rem;
+  }
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+  .feature-card {
+    width: 100%;
+  }
+  .testimonials-title {
+    font-size: 1.75rem;
+  }
+}

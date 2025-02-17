@@ -1,63 +1,14 @@
-/* General Styles */
-body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background-color: #1e344e; /* Dark blue background */
-  color: white; /* White text */
-}
-
-.main-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 80vh;
-  text-align: center;
-}
-
-/* Navbar Styles */
-
-header .logo {
-  font-size: 1.5rem; /* Same font size for logo */
-  font-weight: bold;
-}
-
-.nav-links {
-  display: flex;
-  gap: 1rem;
-}
-
-.nav-links a {
-  position: relative;
-  text-decoration: none;
-  color: #020202;
-  font-size: 1.1rem; /* Ensure same font size */
-  text-transform: uppercase;
-  padding: 10px 20px; /* Same padding for all links */
-  transition: background-color 0.3s ease, color 0.3s ease;
-  letter-spacing: 0.1em;
-}
-
-/* Hover effect for general links */
-.nav-links a:hover {
-  background-color: #457b9d; /* Set background color on hover */
-  color: #ffffff; /* Change text color to white on hover */
-}
-
-/* Active link style */
-.nav-links a.active {
-  background-color: #457b9d; /* Keep background color for active link */
-  color: #ffffff; /* Change text color to white for active link */
-  padding: 10px 20px;
-  border-radius: 5px;
-}
-
-/* Line effect under the Study link */
-.nav-links a:nth-child(2) {
+/* Line effect under the Study, Home, and Simulation links */
+.nav-links a:nth-child(1), 
+.nav-links a:nth-child(2), 
+.nav-links a:nth-child(3) {
   display: inline-block;
   position: relative;
 }
 
-.nav-links a:nth-child(2)::after {
+.nav-links a:nth-child(1)::after,
+.nav-links a:nth-child(2)::after,
+.nav-links a:nth-child(3)::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -68,8 +19,10 @@ header .logo {
   transition: width 0.3s ease;
 }
 
-/* Hover effect for the Study link */
-.nav-links a:nth-child(2):hover::after {
+/* Hover effect for the Study, Home, and Simulation links */
+.nav-links a:nth-child(1):hover::after,
+.nav-links a:nth-child(2):hover::after,
+.nav-links a:nth-child(3):hover::after {
   width: 100%; /* Expand the underline on hover */
 }
 
@@ -78,71 +31,137 @@ header .logo {
   content: none; /* No tooltip */
 }
 
-/* Content Styles */
+/* Content Styling */
 .content {
-  padding: 20px;
+  padding: 40px;
   margin-top: 60px; /* Adjust for navbar */
   text-align: center;
+  max-width: 1200px; /* Ensure content doesn't stretch too much */
+  margin: 0 auto;
 }
 
+/* Content Header Styling */
 .content h1 {
-  font-size: 24px;
-  margin-bottom: 20px;
-  font-size: 2rem;
-  margin-bottom: 1rem;
+  font-size: 2.2rem;
+  margin-bottom: 1.2rem;
   color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: bold;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Image Container */
+/* Image Container Styling */
 .body-chart {
   display: flex;
   justify-content: center;
-  margin-top: 30px;
+  margin-top: 40px;
+  gap: 20px; /* More spacious gap between images */
+  flex-wrap: wrap; /* Ensures responsiveness */
 }
 
-.body-chart .human-body {
+/* Human Body Image Container */
+.human-body {
   position: relative;
   display: inline-block;
-  margin: 0 10px; /* Adjusted margin between body images */
+  text-align: center;
+  max-width: 590px; /* Set max width for each image */
 }
 
+/* Body Image */
 .body-img {
-  max-width: 700px; /* 2x bigger */
+  width: 100%; /* Ensure full container width */
   height: auto;
   cursor: pointer;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 12px; /* Soft rounded corners */
+  border: 3px solid transparent; /* For hover effect */
 }
 
-/* Tooltip Text */
+/* Hover Effects */
+.body-img:hover {
+  transform: scale(1.08); /* Smooth zoom effect */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25); /* Enhanced shadow */
+  border-color: rgba(255, 255, 255, 0.5); /* Subtle border */
+}
+
+/* Tooltip Styling */
 .tooltip {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background-color: #fff;
-  color: #000;
-  padding: 5px;
-  border-radius: 5px;
-  display: none;
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  padding: 10px;
+  border-radius: 8px;
   font-weight: bold;
-  z-index: 5;
+  z-index: 10;
+  font-size: 1rem;
+  text-align: center;
+  width: 130px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
+/* Tooltip Text */
 .tooltip-text {
   display: block;
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
 }
 
-/* Hover Effects */
-#body-1:hover .body-img,
-#body-2:hover .body-img {
-  transform: scale(1.1); /* Slight zoom on hover */
+/* Tooltip Hover Effect */
+.human-body:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-60%);
 }
 
-#body-1:hover #tooltip-1 {
-  display: block;
-  left: 1%; /* Tooltip position */
+/* Tooltip Positioning */
+#body-1 .tooltip {
+  left: 10%;
 }
 
-#body-2:hover #tooltip-2 {
-  display: block;
-  right: 1%; /* Tooltip position */
+#body-2 .tooltip {
+  right: 10%;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .body-img {
+    max-width: 90%; /* Ensure images scale nicely */
+  }
+}
+
+@media (max-width: 768px) {
+  .content h1 {
+    font-size: 1.8rem;
+  }
+  
+  .tooltip {
+    width: 110px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .body-chart {
+    flex-direction: column; /* Stack images on smaller screens */
+    gap: 15px;
+  }
+
+  .human-body {
+    margin: 0;
+  }
+
+  .body-img {
+    max-width: 100%;
+  }
+
+  .tooltip {
+    font-size: 0.85rem;
+    width: 100px;
+  }
 }

@@ -9,6 +9,7 @@ const Ankle = () => {
     const modelViewerRef = useRef(null);
 
     useEffect(() => {
+        document.body.style.overflow = 'hidden'; // Prevent scroll when model is shown
         if (showModel) {
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(
@@ -37,30 +38,36 @@ const Ankle = () => {
 
             // Load model in static position
             loader.load(
-              '/models/foot.glb',
-              (glb) => {
-                  const loadedHandModel = glb.scene;
-                  loadedHandModel.traverse((child) => {
-                      if (child.isMesh) {
-                          child.castShadow = true;
-                          child.receiveShadow = true;
-                      }
-                  });
-          
-                  // Adjust the scale here
-                  loadedHandModel.scale.set(1.2,1.2,1.2); // Set desired scale
-          
-                  // Set rotation: x = 0 degrees, y = 0 degrees, z = -100 degrees
-                  loadedHandModel.rotation.set(0, 0, 0,); // -Math.PI is -180 degrees in radians
-          
-                  loadedHandModel.position.set(.2, -9.5, 0);
-                  scene.add(loadedHandModel);
-              },
-              undefined,
-              (error) => {
-                  console.error('Error loading hand model:', error);
-              }
-          );
+                '/models/foot.glb',
+                (glb) => {
+                    const loadedHandModel = glb.scene;
+                    loadedHandModel.traverse((child) => {
+                        if (child.isMesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                        }
+                    });
+            
+                    // Adjust the scale
+                    loadedHandModel.scale.set(1.2, 1.2, 1.2);
+            
+                    // Convert degrees to radians and set rotation
+                    loadedHandModel.rotation.set(
+                        -Math.PI,       // -180 degrees in radians
+                        Math.PI / 2,    // 90 degrees in radians
+                        -Math.PI / 2    // -90 degrees in radians
+                    );
+            
+                    // Set position
+                    loadedHandModel.position.set(2.7, -8.0, -.5);
+                    scene.add(loadedHandModel);
+                },
+                undefined,
+                (error) => {
+                    console.error('Error loading foot model:', error);
+                }
+            );
+            
 
 
             // Load X-ray model

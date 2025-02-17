@@ -16,7 +16,19 @@ const Simulation = () => {
     const dragControlsRef = useRef(null);
     const [currentItem, setCurrentItem] = useState(0);
     const [passedCurrentItem, setPassedCurrentItem] = useState(false);
+    const [timer, setTimer] = useState(30); // Timer set for 30 seconds
+    const [disableControls, setDisableControls] = useState(false);
+    const [showLabConfirmation, setShowLabConfirmation] = useState(false); 
+    const [labConfirmed, setLabConfirmed] = useState(false); // Track if user accepted
+    const [passedCount, setPassedCount] = useState(0);
+    const [finalScore, setFinalScore] = useState(0);
+    const [showResultModal, setShowResultModal] = useState(false);
+    const [disableNext, setDisableNext] = useState(false); // Controls the Next button visibility
 
+
+
+
+ 
 
     const boundaries = {
         minX: -10,
@@ -34,6 +46,7 @@ const Simulation = () => {
             targetRotation: { x: 0, y: 0, z: 0 }, // No conversion needed (0 degrees = 0 radians)
             threshold: 0.5,
             scale: { x: 1, y: 1, z: 1 }, // Scale added here
+            instructionText: "Properly simulate the PA Hand position"
         },
         {
             ModelFile: '/models/wrist.glb',
@@ -45,6 +58,7 @@ const Simulation = () => {
             },
             threshold: 0.1,
             scale: { x: 6, y: 6, z: 6 }, // Scale added here
+            instructionText: "Properly simulate the Lateral Wrist position"
         },
         {
             ModelFile: '/models/elbow.glb',
@@ -56,6 +70,7 @@ const Simulation = () => {
             },
             threshold: 0.2,
             scale: { x: 4, y: 4, z: 4 }, // Scale added here
+            instructionText: "Properly simulate the AP Elbow position"
         },
         {
             ModelFile: '/models/foot.glb',
@@ -67,29 +82,72 @@ const Simulation = () => {
             },
             threshold: 0.3,
             scale: { x: 1.2, y: 1.2, z: 1.2 }, // Scale added here
+            instructionText: "Properly simulate the AP Foot position"
         },
         {
             ModelFile: '/models/foot.glb',
-            targetPosition: { x: 8.06, y:-0.49, z: 3.61 },
+            targetPosition: { x: -8.25, y: -0.63, z: 2.36 },
             targetRotation: { 
-                x: 0, 
-                y: 0, 
-                z: -100 * (Math.PI / 180) // Convert -100 degrees to radians (-1.745 radians)
+                x: -Math.PI, 
+                y: Math.PI / 2, 
+                z: -Math.PI / 2,
             },
-            threshold: 0.7,
+            threshold: 0.3,
             scale: { x: 1, y: 1, z: 1 }, // Scale added here
+            instructionText: "Properly simulate the Lateral Ankle position"
         }
+        
     ];
-    
-    
 
-
+    const updateInstructionText = (modelIndex) => {
+        const instruction = simulationSettings[modelIndex].instructionText;
+        if (!passedCurrentItem) {
+            // Only update the instruction text if the user hasn't passed the current item
+            setFeedbackMessage(instruction);
+    }
+};
     const enterSimulation = () => {
-        setShowIntro(true);
-        setShowModel(true);
+        // Show confirmation pop-up before beginning the simulation
+        const confirmation = window.confirm('Are you ready to begin the simulation?');
+        if (confirmation) {
+            setShowIntro(false);  // Hide intro screen after confirmation
+            setShowModel(true);   // Show the model for the simulation
+            setShowLabConfirmation(true); // Show the second confirmation modal
+
+              // Reset states for a fresh start
+        setCurrentItem(0);
+        setTimer(simulationSettings[0].timeLimit || 60); // Set timer to the first item's time limit or default 60s
+        setHandPosition({ x: 0, y: 0, z: 0 });
+        setHandRotation({ x: 0, y: 0, z: 0 });
+        setPassedCurrentItem(false);
+        setFeedbackMessage('');
+        setFeedbackColor('red');
+        setDisableControls(true); // Disable interactions until lab confirmation
+
+        // Show the second confirmation after entering the first model
+        setShowLabConfirmation(true); 
+
+        }
+    };
+
+    const handleLabConfirmation = (confirmed) => {
+        setShowLabConfirmation(false); // Hide the pop-up
+        setDisableControls(!confirmed); // Enable controls if confirmed
+        if (confirmed) {
+            setLabConfirmed(true); // Start the timer after confirmation
+        } else {
+            // If canceled, return to intro screen
+            setShowIntro(true);
+            setShowModel(false); // Hide the model
+            setDisableControls(true); // Keep interactions disabled
+        }
     };
 
     useEffect(() => {
+        document.body.style.overflow = 'hidden'; // Prevent scroll when model is shown
+        updateInstructionText(currentItem);
+        setTimer(30);
+
         if (showModel) {
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(
@@ -99,6 +157,7 @@ const Simulation = () => {
                 1000
             );
             camera.position.set(0, 0, 60);
+            
     
             const renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -106,7 +165,9 @@ const Simulation = () => {
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             modelViewerRef.current.innerHTML = '';
             modelViewerRef.current.appendChild(renderer.domElement);
-    
+            
+            document.body.style.overflow = 'hidden';
+
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
             scene.add(ambientLight);
     
@@ -208,14 +269,34 @@ const Simulation = () => {
             return () => {
                 renderer.dispose();
                 controls.dispose();
+                document.body.style.overflow = 'auto';
             };
         }
     }, [showModel, currentItem]);
     
+    
+// Timer logic (Modify to wait for lab confirmation)
+useEffect(() => {
+    if (showModel && showLabConfirmation) return; // Prevent timer from starting while pop-up is open
+
+    if (timer <= 0 && !passedCurrentItem) {
+        setFeedbackMessage('Time is up! Proceed to the next model.');
+        setFeedbackColor('red');
+        setPassedCurrentItem(true);
+        setDisableControls(true);
+    } else if (showModel && !passedCurrentItem && labConfirmed) { 
+        const interval = setInterval(() => {
+            setTimer((prev) => prev - 1);
+        }, 1000);
+        return () => clearInterval(interval);
+    }
+}, [timer, showModel, passedCurrentItem, labConfirmed, showLabConfirmation]);
 
     const handleVerifyPlacement = () => {
-        const { targetPosition, targetRotation, threshold } = simulationSettings[currentItem];
-    
+        if (disableControls) return; // Prevent action if controls are disabled
+
+        const { targetPosition, targetRotation, threshold, ModelFile } = simulationSettings[currentItem];
+        
         // Calculate distance between current and target positions
         const distance = Math.sqrt(
             Math.pow(handPosition.x - targetPosition.x, 2) +
@@ -223,23 +304,55 @@ const Simulation = () => {
             Math.pow(handPosition.z - targetPosition.z, 2)
         );
     
-        // Check both position and all rotation axes
-        if (distance <= threshold &&
-            Math.abs(Model.rotation.x - targetRotation.x) < 0.01 &&
-            Math.abs(Model.rotation.y - targetRotation.y) < 0.01 &&
-            Math.abs(Model.rotation.z - targetRotation.z) < 0.01) {  // Added z-rotation check
-            setFeedbackMessage('You passed!');
-            setFeedbackColor('green');
-            setPassedCurrentItem(true);
-        } else {
-            setFeedbackMessage('Wrong position or rotation!');
-            setFeedbackColor('red');
+     // Check if the current model is the elbow and validate Z rotation differently
+    let isRotationValid = 
+    Math.abs(Model.rotation.x - targetRotation.x) < 0.01 &&
+    Math.abs(Model.rotation.y - targetRotation.y) < 0.01;
+
+if (ModelFile === '/models/elbow.glb') {
+    // Allow both -180° (-π) and 180° (π)
+    const zRotation = Model.rotation.z;
+    isRotationValid = isRotationValid && 
+        (Math.abs(zRotation - (-Math.PI)) < 0.01 || Math.abs(zRotation - Math.PI) < 0.01);
+} else {
+    // Normal rotation validation for other models
+    isRotationValid = isRotationValid && Math.abs(Model.rotation.z - targetRotation.z) < 0.01;
+}
+
+// Check both position and rotation
+if (distance <= threshold && isRotationValid) {
+    setFeedbackMessage('You passed!');
+    setFeedbackColor('green');
+    setPassedCurrentItem(true);
+    setDisableControls(true);    // Disable controls
+    setTimer(0);                 // Stop the timer immediately
+
+    // Increment the passed count for scoring
+    setPassedCount(prevCount => prevCount + 1);
+} else {
+    setFeedbackMessage('Wrong positioning technique!');
+    setFeedbackColor('red');
+
+             // Set a delay to revert to the instruction text only if the user hasn't passed
+        setTimeout(() => {
+            updateInstructionText(currentItem);
+        }, 2000);
         }
     };
+    useEffect(() => {
+        if (timer === 0) {
+            if (currentItem === simulationSettings.length - 1) {
+                handleEndSimulation(); // End simulation only if on the last item
+            } else {
+                setDisableNext(false); // Allow next button to be enabled for other items
+            }
+        }
+    }, [timer]);
 
     const handleRotationChange = (axis, value) => {
-        if (!Model) return;
+        if (disableControls || !Model) return; // Prevent rotation changes if controls are disabled
 
+        
         const rotationValue = parseFloat(value) * Math.PI / 180;
         if (axis === 'x') {
             Model.rotation.x = rotationValue;
@@ -263,9 +376,30 @@ const Simulation = () => {
             // Reset position and rotation to 0, 0, 0
             setHandPosition({ x: 0, y: 0, z: 0 });
             setHandRotation({ x: 0, y: 0, z: 0 });  // Reset rotation
+             // Reset the timer for the next model
+        setTimer(simulationSettings[currentItem + 1].timeLimit);
+
+        // Enable the controls for the next item
+        setDisableControls(false);
+    } else {
+        // If this is the last item, end the simulation
+        handleEndSimulation();
         }
     };
     
+    const handleEndSimulation = () => {
+        // Calculate the final score
+        const totalItems = simulationSettings.length;
+        const score = ((passedCount / totalItems) * 100).toFixed(2);
+        
+        // Show the result modal
+        setShowResultModal(true);
+        setFinalScore({ correct: passedCount, total: totalItems, percentage: score });
+
+        // Keep the last model visible while showing the result modal
+        setShowModel(true);  // Ensure model stays visible
+        setShowIntro(false); // Prevent redirection immediately
+};
 
     const handleExitSimulation = () => {
         const confirmation = window.confirm('Are you sure you want to exit? All progress will be lost.');
@@ -278,6 +412,7 @@ const Simulation = () => {
             setFeedbackMessage('');
             setFeedbackColor('red');
             setPassedCurrentItem(false);
+            
     
             if (Model) {
                 Model.traverse((child) => {
@@ -301,6 +436,159 @@ const Simulation = () => {
 
     return (
         <div>
+             {showResultModal && (
+    <div
+        style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 999,
+        }}
+    >
+        <div
+            style={{
+                backgroundColor: '#f8f9fa',
+                padding: '30px',
+                borderRadius: '12px',
+                boxShadow: '0 6px 12px rgba(0, 0, 0, 0.3)',
+                width: '400px',
+                textAlign: 'center',
+                animation: 'fadeIn 0.3s ease-in-out',
+            }}
+        >
+            <h2 style={{ color: '#333', marginBottom: '15px' }}>Simulation Complete!</h2>
+            <p style={{ color: '#555', fontSize: '16px', lineHeight: '1.5' }}>
+                Thank you for completing the simulation! 🎉   Here are your results:
+            </p>
+
+            <p style={{ fontSize: '18px', fontWeight: 'bold', margin: '15px 0' }}>
+                Correct: {finalScore?.correct}/{finalScore?.total}
+            </p>
+            <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#28a745' }}>
+                Final Score: {finalScore?.percentage}%
+            </p>
+
+            {/* Buttons */}
+            <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
+                <button
+                    onClick={() => {
+                        // Hide modal & reset the simulation state
+                        setShowResultModal(false);
+                        setShowIntro(true);
+                        setShowModel(false);
+                        setCurrentItem(0);
+                        setHandPosition({ x: 0, y: 0, z: 0 });
+                        setHandRotation({ x: 0, y: 0, z: 0 });
+                        setFeedbackMessage('');
+                        setDisableControls(false);
+                        setPassedCount(0);
+                    }}
+                    style={{
+                        padding: '12px 24px',
+                        backgroundColor: '#007bff',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        transition: 'background 0.3s',
+                    }}
+                    onMouseOver={(e) => (e.target.style.backgroundColor = '#0056b3')}
+                    onMouseOut={(e) => (e.target.style.backgroundColor = '#007bff')}
+                >
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+)}
+             {showLabConfirmation && (
+            <div
+            style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent overlay
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                zIndex: 999,
+            }}
+        >
+            {/* Pop-up Modal */}
+            <div
+                style={{
+                    backgroundColor: '#f8f9fa', // Light background for contrast
+                    padding: '30px',
+                    borderRadius: '12px',
+                    boxShadow: '0 6px 12px rgba(0, 0, 0, 0.3)',
+                    width: '400px',
+                    textAlign: 'center',
+                    animation: 'fadeIn 0.3s ease-in-out',
+                }}
+            >
+                <h2 style={{ color: '#333', marginBottom: '15px' }}>
+                    Lab Activity Confirmation
+                </h2>
+                <p style={{ color: '#555', fontSize: '16px', lineHeight: '1.5' }}>
+                    You need to complete 5 lab activities: <b>PA Hand, Lateral Wrist, AP Elbow, AP Foot, 
+                    and Lateral Ankle.</b> You will have <b><u>30 seconds</u></b> to complete each activity. 
+                    Ensure correct positioning for each model. Are you ready to begin?
+                </p>
+    
+                {/* Buttons */}
+                <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
+                    <button
+                        onClick={() => handleLabConfirmation(true)}
+                        style={{
+                            padding: '12px 24px',
+                            backgroundColor: '#28a745',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            fontSize: '16px',
+                            fontWeight: 'bold',
+                            marginRight: '10px',
+                            transition: 'background 0.3s',
+                        }}
+                        onMouseOver={(e) => (e.target.style.backgroundColor = '#218838')}
+                        onMouseOut={(e) => (e.target.style.backgroundColor = '#28a745')}
+                    >
+                        OK
+                    </button>
+    
+                    <button
+                        onClick={() => handleLabConfirmation(false)}
+                        style={{
+                            padding: '12px 24px',
+                            backgroundColor: '#dc3545',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            fontSize: '16px',
+                            fontWeight: 'bold',
+                            transition: 'background 0.3s',
+                        }}
+                        onMouseOver={(e) => (e.target.style.backgroundColor = '#c82333')}
+                        onMouseOut={(e) => (e.target.style.backgroundColor = '#dc3545')}
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    )}
             {showIntro && (
                 <div
                     style={{
@@ -331,6 +619,7 @@ const Simulation = () => {
             )}
 
             {showModel && (
+                
                 <div
                     id="model-viewer-container"
                     style={{
@@ -419,26 +708,26 @@ const Simulation = () => {
                         Verify Placement
                     </button>
 
-                    {passedCurrentItem && (
-                        <button
-                            onClick={handleNextItem}
-                            style={{
-                                position: 'absolute',
-                                bottom: '100px',
-                                left: '40px',
-                                backgroundColor: 'green',
-                                color: 'white',
-                                padding: '20px 30px',
-                                border: 'none',
-                                borderRadius: '9px',
-                                fontSize: '30px',
-                                cursor: 'pointer',
-                                zIndex: 20,
-                            }}
-                        >
-                            Next
-                        </button>
-                    )}
+                    {passedCurrentItem && currentItem < simulationSettings.length - 1 && (
+                <button
+                    onClick={handleNextItem}
+                    style={{
+                        position: 'absolute',
+                        bottom: '100px',
+                        left: '40px',
+                        backgroundColor: 'green',
+                        color: 'white',
+                        padding: '20px 30px',
+                        border: 'none',
+                        borderRadius: '9px',
+                        fontSize: '30px',
+                        cursor: 'pointer',
+                        zIndex: 20,
+                    }}
+                >
+                    Next
+                </button>
+            )}
 
                     {feedbackMessage && (
                         <div
@@ -505,6 +794,23 @@ const Simulation = () => {
                             />
                         </div>
 
+                      {/* Timer positioned in the upper right */}
+                        <div style={{
+                            position: 'absolute',
+                            top: '-400px',
+                            right: '10px',
+                            textAlign: 'right',
+                            
+                        }}>
+                            {showModel && (
+                                <div>
+                                    <p style={{ margin: 0 }}>Time Remaining: {Math.floor(timer / 60)}:{String(timer % 60).padStart(2, '0')}</p>
+
+                                  
+                                </div>
+                            )}
+                        </div>
+
                         {/* Z Rotation */}
                         <div style={{ marginBottom: '10px' }}>
                             <div>Z Rotation</div>
@@ -519,7 +825,30 @@ const Simulation = () => {
                         </div>
                     </div>
 
-
+                    {showModel && (
+                <div>
+                    <div>
+                        <h2 style={{ color: feedbackColor }}>{feedbackMessage}</h2>
+                        <button
+                            onClick={handleVerifyPlacement}
+                            disabled={disableControls}
+                        >
+                            Verify Placement
+                        </button>
+                        <button
+                            onClick={handleNextItem}
+                            disabled={!passedCurrentItem}
+                        >
+                            {currentItem === simulationSettings.length - 1
+                                ? 'Finish Simulation' // Change button text for the last item
+                                : 'Next Model'}
+                        </button>
+                        <button onClick={handleExitSimulation}>Exit Simulation</button>
+                    </div>
+                    {/* Your existing simulation and model rendering logic */}
+                </div>
+            )}
+        
                 </div>
             )}
         </div>

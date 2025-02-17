@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Routes, Route, NavLink, useLocation } from "react-router-dom";
 import "./App.css";
 import Study from "./study";
@@ -10,6 +10,7 @@ import Lower from "./lower-ex";
 import Foot from "./foot";
 import Ankle from "./ankle";
 import Simulation from "./simulation";
+import Homepage from "./homepage";
 
 const App = () => {
   const location = useLocation();
@@ -19,6 +20,15 @@ const App = () => {
     const studyPaths = ['/study', '/upper', '/hand', '/wrist', '/elbow', '/lower', '/foot', '/ankle'];
     return studyPaths.some(path => location.pathname === path);
   };
+
+// 🔥 Fix: Restore scrolling when switching pages
+useEffect(() => {
+  if (location.pathname === "/") {
+    document.body.style.overflow = "auto"; // Always enable scrolling on homepage
+  } else if (location.pathname === "/simulation") {
+    document.body.style.overflow = "hidden"; // Hide scrolling in simulation
+  }
+}, [location.pathname]);
 
   return (
     <div>
@@ -43,7 +53,7 @@ const App = () => {
 
       {/* Main Content */}
       <Routes>
-        <Route path="/" element={<p>Welcome to the homepage! Test content goes here.</p>} />
+        <Route path="/" element={<Homepage />} />
         <Route path="/study" element={<Study />} />
         <Route path="/upper" element={<Upper />} />
         <Route path="/hand" element={<Hand />} />
@@ -55,6 +65,7 @@ const App = () => {
         <Route path="/simulation" element={<Simulation />} />
       </Routes>
     </div>
+    
   );
 };
 
